@@ -4,6 +4,32 @@
     padding: 0 20px;
 }
 
+/* Stacked horizontal layout */
+.home-sections-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 0 40px;
+    margin-top: 20px;
+}
+
+.home-recommendations-section {
+    background-color: #fff8f5;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.home-menu-section {
+    padding: 20px 0;
+}
+
+@media (max-width: 1024px) {
+    .home-sections-container {
+        padding: 0 20px;
+    }
+}
+
 .search-bar {
     display: flex;
     align-items: center;

@@ -3,6 +3,7 @@ import './Home.css';
 import Header from '../../components/Header/Header';
 import ExploreMenu from '../../components/ExploreMenu/ExploreMenu';
 import FoodDisplay from '../../components/foodDisplay/FoodDisplay';
+import RecommendedForYou from '../../components/foodDisplay/RecommendedForYou';
 import AppDownload from '../../components/AppDownload/AppDownload';
 import { StoreContext } from '../../context/StoreContext';
 
@@ -13,21 +14,21 @@ const Home = () => {
     return (
         <div>
             <Header />
-
-            {/* Professional Search Bar */}
-            {/* <div className="search-bar-container">
-                <div className="search-bar">
-                    <input
-                        type="text"
-                        placeholder="Search for food items..."
-                        value={searchTerm || ""}
-                        onChange={(e) => setSearchTerm && setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div> */}
-
+            
             <ExploreMenu category={category} setCategory={setCategory} />
-            <FoodDisplay category={category} />
+            
+            <div className="home-sections-container">
+                {/* Section 1: AI Recommendations */}
+                <div className="home-recommendations-section">
+                    <RecommendedForYou />
+                </div>
+
+                {/* Section 2: Original Menu */}
+                <div className="home-menu-section">
+                    <FoodDisplay category={category} />
+                </div>
+            </div>
+
             <AppDownload />
         </div>
     );

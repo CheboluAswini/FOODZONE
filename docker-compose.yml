@@ -26,6 +26,17 @@ services:
       - JWT_SECRET=development_secret_key_123
       - ADMIN_EMAIL=admin@example.com
       - ADMIN_PASSWORD=admin
+      - ML_SERVICE_URL=http://ml-service:8000
+    networks:
+      - foodzone_network
+
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: foodzone_ml_service
+    ports:
+      - '8000:8000'
     networks:
       - foodzone_network
 

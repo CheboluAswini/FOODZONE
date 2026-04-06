@@ -40,6 +40,8 @@ console.log('[INIT] Loading routes...');
 const userRouter = require('./routes/userRoute');
 const foodRouter = require('./routes/foodRoute');
 const orderRouter = require('./routes/orderRoute');
+const chatRouter = require('./routes/chatRoute');
+const mlRouter = require('./routes/mlRoute');
 let paymentRouter;
 try {
     paymentRouter = require('./routes/paymentRoute');
@@ -48,6 +50,8 @@ try {
 app.use('/api/user', userRouter);
 app.use('/api/food', foodRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/ml', mlRouter);
 if (paymentRouter) app.use('/api/payment', paymentRouter);
 
 // Temporary fix if adminRoute doesn't exist separately

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './Chatbot.css';
+import { StoreContext } from '../../context/StoreContext';
 
 const Chatbot = () => {
+    const { url } = useContext(StoreContext);
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         { text: "Hi! I am the FoodZone bot. How can I help you today?", isBot: true }
@@ -10,31 +12,46 @@ const Chatbot = () => {
 
     const toggleChat = () => setIsOpen(!isOpen);
 
-    const handleSend = (e) => {
+    const handleSend = async (e) => {
         e.preventDefault();
         if (!input.trim()) return;
 
         const userMsg = { text: input, isBot: false };
-        setMessages([...messages, userMsg]);
+        setMessages(prev => [...prev, userMsg]);
         setInput('');
 
-        // Simple mock response logic based on keywords
-        setTimeout(() => {
-            let botReply = "I am a simple bot. Please contact support for more complex queries.";
-            const lowerInput = userMsg.text.toLowerCase();
-            
-            if (lowerInput.includes('order')) {
-                botReply = "You can track your orders in the 'My Orders' section from your profile.";
-            } else if (lowerInput.includes('delivery')) {
-                botReply = "Delivery usually takes 30-45 minutes depending on your location.";
-            } else if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
-                botReply = "Hello! Looking for some delicious food?";
-            } else if (lowerInput.includes('payment') || lowerInput.includes('pay')) {
-                botReply = "We accept Cash on Delivery, UPI, Cards, and NetBanking.";
-            }
+        // Loading state
+        const loadingMsg = { text: "Typing...", isBot: true, isLoading: true };
+        setMessages(prev => [...prev, loadingMsg]);
 
-            setMessages(prev => [...prev, { text: botReply, isBot: true }]);
-        }, 1000);
+        try {
+            const token = localStorage.getItem('token') || '';
+            const response = await fetch(`${url}/api/chat/ask`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'token': token
+                },
+                body: JSON.stringify({ message: input })
+            });
+
+            const data = await response.json();
+            
+            setMessages(prev => {
+                const filtered = prev.filter(m => !m.isLoading);
+                if (data.success) {
+                    return [...filtered, { text: data.answer, isBot: true }];
+                } else {
+                    return [...filtered, { text: "Sorry, I'm having trouble connecting right now.", isBot: true }];
+                }
+            });
+        } catch (error) {
+            console.error("Chat Error:", error);
+            setMessages(prev => [
+                ...prev.filter(m => !m.isLoading),
+                { text: "Connection error. Please try again later.", isBot: true }
+            ]);
+        }
     };
 
     return (
