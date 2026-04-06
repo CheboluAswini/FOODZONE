@@ -1,0 +1,24 @@
+.sidebar {
+  width: 220px;
+  min-height: calc(100vh - 64px);
+  border-right: 1px solid #eceff3;
+  background: #fff;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  text-decoration: none;
+  color: #111827;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.item.active {
+  background: #fff1ed;
+  border-color: #ffccb8;
+  color: #c2410c;
+}

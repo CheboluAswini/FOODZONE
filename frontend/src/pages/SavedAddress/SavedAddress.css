@@ -1,0 +1,144 @@
+.saved-addr-container {
+    min-height: 60vh;
+    padding: 40px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.saved-addr-card {
+    width: 100%;
+    max-width: 600px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+}
+
+.saved-addr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.saved-addr-header h2 {
+    color: #333;
+    font-size: 24px;
+}
+
+.add-new-btn {
+    background: none;
+    border: 1px solid #FF6347;
+    color: #FF6347;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.add-new-btn:hover {
+    background: #FF6347;
+    color: white;
+}
+
+.address-form {
+    background: #fdfdfd;
+    border: 1px dashed #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.address-form h4 {
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.address-form input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+}
+
+.address-form input:focus {
+    border-color: #FF6347;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row input {
+    flex: 1;
+}
+
+.save-addr-btn {
+    padding: 12px;
+    background: #FF6347;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.empty-addresses {
+    text-align: center;
+    padding: 40px 0;
+    color: #777;
+}
+
+.address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.address-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    background: #fcfcfc;
+}
+
+.addr-details p {
+    margin: 3px 0;
+    color: #555;
+    font-size: 14px;
+}
+
+.addr-details .addr-street {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+}
+
+.addr-details .addr-phone {
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.delete-addr-btn {
+    background: #ffeeeb;
+    color: #FF6347;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.delete-addr-btn:hover {
+    background: #ffded8;
+}

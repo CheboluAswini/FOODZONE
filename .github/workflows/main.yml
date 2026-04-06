@@ -1,0 +1,46 @@
+name: FOODZONE CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
+        
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.11.0
+      with:
+        mongodb-version: '6.0'
+        
+    - name: Install Backend Dependencies
+      run: cd backend && npm install
+      
+    - name: Run Backend Tests
+      run: cd backend && npm test
+      env:
+        PORT: 5000
+        MONGODB_URI: mongodb://localhost:27017/foodzone_test
+        JWT_SECRET: test_secret_key
+        
+    - name: Build Frontend
+      run: cd frontend && npm install && npm run build
+      
+    - name: Build Admin
+      run: cd admin && npm install && npm run build

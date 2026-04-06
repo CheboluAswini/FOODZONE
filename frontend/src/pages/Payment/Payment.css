@@ -1,0 +1,115 @@
+.payment-container {
+  max-width: 560px;
+  margin: 40px auto;
+  background: #fff;
+  border: 1px solid #eceff3;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.order-line {
+  color: #6b7280;
+  margin: 8px 0 16px;
+}
+
+.pay-options {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.payment-container button {
+  height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: #ff6347;
+  color: #fff;
+  padding: 0 16px;
+  cursor: pointer;
+}
+
+.payment-summary {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.amount-line {
+  font-size: 16px;
+  color: #111827;
+  margin-top: 4px;
+}
+
+.pay-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #fff;
+  margin-bottom: 8px;
+}
+
+.pay-option:hover {
+  border-color: #ff6347;
+}
+
+.pay-option.active {
+  border-color: #ff6347;
+  background: #fff1ef;
+}
+
+.pay-option input[type="radio"] {
+  margin-right: 12px;
+  accent-color: #ff6347;
+}
+
+.payment-input-group {
+  padding: 0 12px 12px 36px;
+  animation: slideDown 0.3s ease;
+}
+
+.payment-input, .payment-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.payment-input:focus, .payment-select:focus {
+  outline: none;
+  border-color: #ff6347;
+}
+
+.confirm-payment-btn {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: #ff6347;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.confirm-payment-btn:hover {
+  background: #e5533d;
+}
+
+.confirm-payment-btn:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

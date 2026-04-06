@@ -12,3 +12,17 @@
     gap: 30px;
     row-gap: 50px;
 }
+.search-result {
+    text-align: center;
+    margin: 15px 0;
+    color: #666;
+    font-size: 15px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 18px;
+    color: #FF6347;
+    font-weight: 500;
+}

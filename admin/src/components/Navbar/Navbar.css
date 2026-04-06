@@ -1,0 +1,28 @@
+.navbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: white;
+  border-bottom: 1px solid #eceff3;
+}
+
+.logo {
+  height: 42px;
+}
+
+.profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+}
+
+.link-btn {
+  border: 0;
+  background: #ff6347;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}

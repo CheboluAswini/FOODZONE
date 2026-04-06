@@ -1,0 +1,39 @@
+.list {
+  flex: 1;
+  padding: 24px;
+}
+
+.list-grid {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  background: white;
+  border: 1px solid #eceff3;
+  border-radius: 10px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 70px 1fr 100px 100px;
+  align-items: center;
+  gap: 10px;
+}
+
+.row img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.row button {
+  border: none;
+  background: #ef4444;
+  color: white;
+  border-radius: 8px;
+  height: 34px;
+  cursor: pointer;
+}
+
+.pagination { display: flex; justify-content: center; margin-top:20px; gap: 10px; } .pagination button { padding: 5px 10px; border: 1px solid #ccc; cursor: pointer; } .pagination button.active { background: #ff6347; color: white; }

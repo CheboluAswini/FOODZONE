@@ -54,3 +54,73 @@
   cursor: pointer;
   margin-top: 30px;
 }
+.place-order .cart-total button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Address selection styles */
+.address-selection {
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.address-selection h4 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.address-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.address-card.selected {
+  border-color: tomato;
+  background-color: #fffaf9;
+}
+
+.address-card input[type="radio"] {
+  width: auto;
+  margin: 4px 0 0 0;
+  accent-color: tomato;
+  cursor: pointer;
+}
+
+.address-card p {
+  color: #555;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.address-card b {
+  color: #333;
+  font-size: 15px;
+}
+
+.new-address-form {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 800px) {
+  .place-order {
+    flex-direction: column;
+    margin-top: 50px;
+  }
+}
