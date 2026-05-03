@@ -169,8 +169,51 @@ const processStripe = async (req, res) => {
   }
 };
 
+// Stripe Webhook Endpoint
+const stripeWebhook = async (req, res) => {
+  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    if (endpointSecret) {
+      const signature = req.headers['stripe-signature'];
+      event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
+    } else {
+      event = req.body;
+    }
+  } catch (err) {
+    console.error(`[PAYMENT] Webhook Error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const orderId = session.metadata.orderId;
+    const userId = session.metadata.userId;
+
+    try {
+      const order = await Order.findOne({ _id: orderId, userId });
+      if (order && order.payment.status !== 'completed') {
+        order.payment.status = 'completed';
+        order.payment.paidAt = new Date();
+        order.status = 'processing';
+        await order.save();
+        console.log(`[PAYMENT] Webhook fulfilled payment for order: ${orderId}`);
+      }
+    } catch (err) {
+      console.error(`[PAYMENT] Webhook processing error: ${err.message}`);
+    }
+  }
+
+  res.send('null').status(200);
+};
+
 module.exports = { 
   processCOD, 
   processCardPayment,
-  processStripe
+  processStripe,
+  stripeWebhook
 };

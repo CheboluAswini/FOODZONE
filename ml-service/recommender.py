@@ -11,9 +11,10 @@ import numpy as np
 import scipy.sparse as sp
 from implicit.als import AlternatingLeastSquares
 from pymongo import MongoClient
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-MODEL_VERSION = "als-implicit-v1"
-
+MODEL_VERSION = "als-tfidf-hybrid-v2"
 
 @dataclass
 class RecommenderArtifacts:
@@ -27,6 +28,9 @@ class RecommenderArtifacts:
     user_top_categories: Dict[str, List[str]]
     trained_at: str
     model_version: str
+    tfidf_matrix: sp.csr_matrix = None
+    tfidf_vectorizer: TfidfVectorizer = None
+
 
 
 _CACHE = {"path": None, "mtime": None, "artifacts": None}
@@ -40,7 +44,7 @@ def _parse_db_name(uri: str) -> str:
     parsed = urlparse(uri)
     if parsed.path and parsed.path != "/":
         return parsed.path.lstrip("/")
-    return "foodzone"
+    return "test"
 
 
 def _get_db() -> Tuple[MongoClient, object]:
@@ -50,11 +54,12 @@ def _get_db() -> Tuple[MongoClient, object]:
     return client, client[db_name]
 
 
-def _load_foods(db) -> Tuple[List[str], Dict[str, str]]:
-    foods = list(db.foods.find({}, {"_id": 1, "category": 1}))
+def _load_foods(db) -> Tuple[List[str], Dict[str, str], List[str]]:
+    foods = list(db.foods.find({}, {"_id": 1, "category": 1, "name": 1, "description": 1}))
     item_ids = [str(f["_id"]) for f in foods]
-    item_categories = {str(f["_id"]): f.get("category") for f in foods}
-    return item_ids, item_categories
+    item_categories = {str(f["_id"]): f.get("category", "") for f in foods}
+    item_texts = [f"{f.get('name', '')} {f.get('category', '')} {f.get('description', '')}" for f in foods]
+    return item_ids, item_categories, item_texts
 
 
 def _load_orders(db):
@@ -102,11 +107,15 @@ def _top_categories(counts: Dict[str, Dict[str, float]]) -> Dict[str, List[str]]
 def train_and_save_model(model_path: str) -> Dict[str, object]:
     client, db = _get_db()
     try:
-        item_ids, item_categories = _load_foods(db)
+        item_ids, item_categories, item_texts = _load_foods(db)
         orders = _load_orders(db)
 
         if not item_ids:
             raise ValueError("No food items found to train on.")
+
+        # Train TF-IDF for pure Content-Based/Hybrid capabilities
+        tfidf = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = tfidf.fit_transform(item_texts)
 
         interactions, user_category_counts = _build_interactions(
             orders, set(item_ids), item_categories
@@ -151,6 +160,8 @@ def train_and_save_model(model_path: str) -> Dict[str, object]:
             user_top_categories=_top_categories(user_category_counts),
             trained_at=_utc_now(),
             model_version=MODEL_VERSION,
+            tfidf_matrix=tfidf_matrix,
+            tfidf_vectorizer=tfidf
         )
 
         model_path = os.path.abspath(model_path)
@@ -208,21 +219,29 @@ def recommend(user_id: str, k: int, model_path: str) -> Dict[str, object]:
     artifacts = _load_cached(model_path)
 
     if artifacts:
-        if user_id in artifacts.user_id_map:
+        # Check if the user is known for Collaborative Filtering
+        if user_id in artifacts.user_id_map.keys():
             user_index = artifacts.user_id_map[user_id]
-            ids, scores = artifacts.model.recommend(
+            ids, als_scores = artifacts.model.recommend(
                 user_index,
                 artifacts.user_items,
                 N=k,
                 filter_already_liked_items=False,
             )
             item_ids = [artifacts.index_to_item_id[i] for i in ids]
-            norm_scores = _normalize_scores(scores)
+            norm_scores = _normalize_scores(list(als_scores))
+            
+            # Incorporate Hybrid Scoring (ALS + Popularity Boost for items in their top categories)
+            for i, iid in enumerate(item_ids):
+                cat = artifacts.item_categories.get(iid)
+                if cat and cat in artifacts.user_top_categories.get(user_id, []):
+                    norm_scores[i] = min(1.0, norm_scores[i] + 0.15) # Content/Category boost
+
             reasons = _build_reasons(
                 user_id, item_ids, artifacts.item_categories, artifacts.user_top_categories
             )
             return {
-                "source": "model",
+                "source": "hybrid-model",
                 "model_version": artifacts.model_version,
                 "trained_at": artifacts.trained_at,
                 "data": [
@@ -231,6 +250,24 @@ def recommend(user_id: str, k: int, model_path: str) -> Dict[str, object]:
                 ],
             }
 
+        # Cold Start or Anonymous: Use purely Content-Based + Popularity Hybrid
+        popular_ids = _popular_from_artifacts(artifacts, k * 2)
+        if hasattr(artifacts, 'tfidf_matrix') and artifacts.tfidf_matrix is not None and popular_ids:
+            # Just serve the top diverse/popular items as baseline
+            final_ids = popular_ids[:k]
+            reasons = ["Trending hot item" for _ in final_ids]
+            popular_scores = _normalize_scores(_popular_scores(artifacts, final_ids))
+            return {
+                "source": "content-popular",
+                "model_version": artifacts.model_version,
+                "trained_at": artifacts.trained_at,
+                "data": [
+                    {"item_id": item_id, "score": float(score), "reason": reason}
+                    for item_id, score, reason in zip(final_ids, popular_scores, reasons)
+                ],
+            }
+        
+        # Fallback if TFIDF isn't trained yet
         popular_ids = _popular_from_artifacts(artifacts, k)
         reasons = ["Popular right now" for _ in popular_ids]
         popular_scores = _normalize_scores(_popular_scores(artifacts, popular_ids))

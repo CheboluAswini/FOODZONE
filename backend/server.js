@@ -15,9 +15,28 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors()); // Allow all CORS requests for now to fix issues
+
+// Restrict CORS to frontend & admin origins
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5174',
+  process.env.ADMIN_URL || 'http://localhost:5173',
+  process.env.CORS_ORIGIN || 'http://localhost:5174'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // Database Connection
 if (!process.env.MONGODB_URI) {

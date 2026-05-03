@@ -58,15 +58,28 @@ npm install
 npm run dev # Runs on port 5173
 ```
 
-## 🤖 ML Recommendations (Real Model)
-The project includes a Python ML service that trains an implicit-feedback recommendation model from MongoDB order history.
+## 🤖 ML Recommendations (Hybrid Architecture)
+The project includes a highly sophisticated Python ML service built utilizing `scikit-learn` and `implicit`. Instead of dummy recommendations, it trains an AI engine using real data pipelines.
+
+**How the Hybrid Model Works:**
+1. **Collaborative Filtering (ALS)**: 
+   Uses User-Item interaction matrix construction to evaluate historical user orders. An `AlternatingLeastSquares` model calculates latent factors to recommend "items bought by users with similar dining carts."
+2. **Content-Based Filtering (TF-IDF)**:
+   A Vectorizer parses food descriptions, categories, and titles to map linguistic similarity across all database foods.
+3. **Hybrid Boot Scoring**:
+   At predicted inference, ALS outputs are boosted for specific users depending on their highest-rated TF-IDF item category correlations—giving high precision matching.
+
+**Security Enhancements & Vulnerabilities Fixed**:
+- Applied strict `cors` frontend origins, negating cross-site security threats.
+- Stripe processing modified to strictly require `express.raw()` request bodies for cryptographically secure webhook validation via `stripe.webhooks.constructEvent`.
+- Environment variable pipelines isolated preventing runtime crashes during Python memory cache evaluations.
 
 **Environment variables**
 - `ML_SERVICE_URL` (backend → ML service URL)
 - `ML_ADMIN_KEY` (shared secret for training endpoint)
 - `MONGODB_URI` (ML service DB connection)
 
-**Train the model on demand**
+**Train the model on demand (runs async without blocking)**
 ```bash
 POST /api/ml/train
 Header: x-ml-admin-key: <ML_ADMIN_KEY>

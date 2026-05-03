@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import os
@@ -38,14 +38,17 @@ def health_check():
     return {"status": "ok", "service": "ML Service", "model": status}
 
 
-@app.post("/train")
-def train_model(x_ml_admin_key: Optional[str] = Header(default=None)):
-    _verify_admin_key(x_ml_admin_key)
+def _background_train_model():
     try:
-        metrics = train_and_save_model(_model_path())
-        return {"success": True, "metrics": metrics}
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        train_and_save_model(_model_path())
+    except Exception as exc:
+        print(f"Background ML training failed: {exc}")
+
+@app.post("/train")
+def train_model(background_tasks: BackgroundTasks, x_ml_admin_key: Optional[str] = Header(default=None)):
+    _verify_admin_key(x_ml_admin_key)
+    background_tasks.add_task(_background_train_model)
+    return {"success": True, "message": "ML training started in background"}
 
 
 @app.post("/recommendations/{user_id}", response_model=List[Recommendation])
