@@ -57,3 +57,23 @@ cd admin
 npm install
 npm run dev # Runs on port 5173
 ```
+
+## 🤖 ML Recommendations (Real Model)
+The project includes a Python ML service that trains an implicit-feedback recommendation model from MongoDB order history.
+
+**Environment variables**
+- `ML_SERVICE_URL` (backend → ML service URL)
+- `ML_ADMIN_KEY` (shared secret for training endpoint)
+- `MONGODB_URI` (ML service DB connection)
+
+**Train the model on demand**
+```bash
+POST /api/ml/train
+Header: x-ml-admin-key: <ML_ADMIN_KEY>
+```
+
+**Fetch recommendations**
+```bash
+GET /api/ml/recommendations
+Header: token: <JWT>
+```

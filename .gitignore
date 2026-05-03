@@ -6,3 +6,4 @@ build/
 uploads/
 coverage/
 *.log
+ml-service/models/

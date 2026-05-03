@@ -27,6 +27,7 @@ services:
       - ADMIN_EMAIL=admin@example.com
       - ADMIN_PASSWORD=admin
       - ML_SERVICE_URL=http://ml-service:8000
+      - ML_ADMIN_KEY=development_ml_key
     networks:
       - foodzone_network
 
@@ -37,6 +38,10 @@ services:
     container_name: foodzone_ml_service
     ports:
       - '8000:8000'
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/foodzone
+      - ML_MODEL_PATH=/app/models/recommender.joblib
+      - ML_ADMIN_KEY=development_ml_key
     networks:
       - foodzone_network
 
